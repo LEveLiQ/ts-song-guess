@@ -9,11 +9,6 @@ export const guess = async (interaction: CommandInteraction, args: string[]) => 
         return;
     }
 
-    if (args.length === 0) {
-        await interaction.reply('Please provide your guess! Example: /guess "song name"');
-        return;
-    }
-
     await db_functions.ensurePlayer(interaction.user.id, interaction.user.username);
     const guess = args.join(' ');
     const result = gameState.validateGuess(interaction.channelId, guess);
