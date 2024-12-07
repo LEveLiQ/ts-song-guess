@@ -15,7 +15,6 @@ export const guess = async (interaction: CommandInteraction, args: string[]) => 
 
     if (result.correct) {
         const song = gameState.getSong(interaction.channelId);
-        gameState.endGame(interaction.channelId);
         await interaction.reply(`🎉 Correct! The song was **"${song!.title}"**!`);
         switch (gameState.getDifficulty(interaction.channelId)) {
             case 'Normal':
@@ -28,6 +27,7 @@ export const guess = async (interaction: CommandInteraction, args: string[]) => 
                 db_functions.updateScore(interaction.user.id, 3, true);
                 break;
         }
+        gameState.endGame(interaction.channelId);
     } else if (result.isValidSong) {
         await interaction.reply(`❌ **"${result.songTitle}"** is not the correct song! Try again!`);
         db_functions.updateScore(interaction.user.id, 0, false);
