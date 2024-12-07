@@ -29,7 +29,7 @@ const db_functions = {
       ON CONFLICT(discord_id) DO UPDATE SET
       username = excluded.username
       RETURNING *
-    `).get(discord_id, username) as Player;  // Add type assertion here
+    `).get(discord_id, username) as Player; 
   },
 
   updateScore(discord_id: string, points: number, guessed_correctly: boolean) {
@@ -50,14 +50,6 @@ const db_functions = {
       ORDER BY total_score DESC
       LIMIT ?
     `).all(limit) as LeaderboardEntry[];
-  },
-
-  recordGame(player_id: string, song_id: string, guessed_correctly: boolean, attempts: number, time_taken: number) {
-    return db.prepare(`
-      INSERT INTO game 
-      (player_id, song_id, guessed_correctly, attempts_taken, time_taken)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(player_id, song_id, guessed_correctly, attempts, time_taken);
   }
 };
 
