@@ -9,6 +9,7 @@ build/
 .env
 .env.local
 .env.*
+ssh.key
 
 # IDE and editor files
 .vscode/*
