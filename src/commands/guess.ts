@@ -5,7 +5,7 @@ import { db_functions } from '../utils/database';
 export const guess = async (interaction: CommandInteraction, args: string[]) => {
     const gameState = GameStateManager.getInstance();
     if (!gameState.isGameActive(interaction.channelId)) {
-        await interaction.reply('There\'s no active game! Start one with /play');
+        await interaction.reply({ content: 'There\'s no active game! Start one with </play:1314902142422880298>', ephemeral: true });
         return;
     }
 
