@@ -43,7 +43,7 @@ export class GameStateManager {
         const game = this.activeGames.get(channelId);
         if (!game) return { correct: false, isValidSong: false };
 
-        const normalizedGuess = guess.toLowerCase().trim();
+        const normalizedGuess = this.songManager.normalizeTitle(guess);
         
         // Use SongManager to find the song
         const guessedSong = this.songManager.findSongByTitle(normalizedGuess);
@@ -58,7 +58,7 @@ export class GameStateManager {
         }
 
         // If it's the correct song
-        if (normalizedGuess === game.song.title.toLowerCase().trim()) {
+        if (normalizedGuess === this.songManager.normalizeTitle(game.song.title)) {
             return {
                 correct: true,
                 isValidSong: true,
