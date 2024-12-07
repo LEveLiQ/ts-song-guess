@@ -9,7 +9,16 @@ import { guess } from './guess';
 const commands = [
     new SlashCommandBuilder()
         .setName('play')
-        .setDescription('Start a new game'),
+        .setDescription('Start a new game')
+        .addStringOption(option => 
+            option.setName('difficulty')
+                .setDescription('Select difficulty level')
+                .setRequired(false)
+                .addChoices(
+                    { name: 'Normal', value: 'Normal' },
+                    { name: 'Hard', value: 'Hard' },
+                    { name: 'Extreme', value: 'Extreme' }
+                )),
     new SlashCommandBuilder()
         .setName('leaderboard')
         .setDescription('Show the leaderboard'),
@@ -46,16 +55,20 @@ export const handleInteraction = async (interaction: CommandInteraction) => {
 
     try {
         switch (commandName) {
-            case 'play':
-                await play(interaction);
+            case 'play': {
+                const difficulty = options.getString('difficulty', false) ?? 'Normal';
+                await play(interaction, difficulty);
                 break;
-            case 'leaderboard':
+            }
+            case 'leaderboard': {
                 await leaderboard(interaction);
                 break;
-            case 'guess':
-                { const song = options.getString('song', true);
+            }
+            case 'guess': {
+                const song = options.getString('song', true);
                 await guess(interaction, [song]);
-                break; }
+                break; 
+            }
         }
     } catch (error) {
         console.error('Error handling interaction:', error);

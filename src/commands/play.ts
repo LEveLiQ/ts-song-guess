@@ -3,7 +3,7 @@ import { SongManager } from '../utils/songs';
 import { GameStateManager } from '../utils/game_state_manager';
 import { unlink } from 'fs/promises';
 
-export const play = async (interaction: CommandInteraction) => {
+export const play = async (interaction: CommandInteraction, difficulty: string) => {
     const gameState = GameStateManager.getInstance();
 
     if (gameState.isGameActive(interaction.channelId!)) {
@@ -11,11 +11,11 @@ export const play = async (interaction: CommandInteraction) => {
         return;
     }
 
-    const songManager = new SongManager();
+    const songManager = new SongManager(difficulty);
     const song = songManager.getRandomSong();
     
     try {
-        const snippetPath = await songManager.createSongSnippet(song);
+        const snippetPath = await songManager.createSongSnippet(song, difficulty);
         const attachment = new AttachmentBuilder(snippetPath);
         
         const timeoutId = setTimeout(async () => {
@@ -25,10 +25,10 @@ export const play = async (interaction: CommandInteraction) => {
                 }
         }, 60000);
 
-        gameState.startGame(interaction.channelId!, song, timeoutId);
+        gameState.startGame(interaction.channelId!, song, timeoutId, difficulty);
         
         await interaction.reply({
-            content: '🎵 Guess the song! You have 60 seconds.',
+            content: `🎵 Guess the song! You have 60 seconds. Difficulty: **${difficulty}**`,
             files: [attachment]
         });
 

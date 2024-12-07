@@ -6,13 +6,13 @@ export class GameStateManager {
         channelId: string,
         startedAt: Date,
         timeoutId?: NodeJS.Timeout
-        song: Song
+        song: Song,
+        difficulty: string
     }> = new Map();
-    private songManager: SongManager;
+    private songManager: SongManager | null = null;
+    private currentDifficulty: string | null = null;
 
-    private constructor() {
-        this.songManager = new SongManager();
-    }
+    private constructor() {}
 
     public static getInstance(): GameStateManager {
         if (!GameStateManager.instance) {
@@ -21,17 +21,26 @@ export class GameStateManager {
         return GameStateManager.instance;
     }
 
+    private initializeSongManager(): void {
+        if (!this.songManager && this.currentDifficulty) {
+            this.songManager = new SongManager(this.currentDifficulty);
+        }
+    }
+
     public isGameActive(channelId: string): boolean {
         this.cleanupExpiredGames();
         return this.activeGames.has(channelId);
     }
 
-    public startGame(channelId: string, song: Song, timeoutId: NodeJS.Timeout): void {
+    public startGame(channelId: string, song: Song, timeoutId: NodeJS.Timeout, difficulty: string): void {
+        this.currentDifficulty = difficulty;
+        this.initializeSongManager();
         this.activeGames.set(channelId, {
             channelId,
             startedAt: new Date(),
             song,
-            timeoutId
+            timeoutId,
+            difficulty
         });
     }
 
@@ -43,10 +52,10 @@ export class GameStateManager {
         const game = this.activeGames.get(channelId);
         if (!game) return { correct: false, isValidSong: false };
 
-        const normalizedGuess = this.songManager.normalizeTitle(guess);
+        const normalizedGuess = this.songManager!.normalizeTitle(guess);
         
         // Use SongManager to find the song
-        const guessedSong = this.songManager.findSongByTitle(normalizedGuess);
+        const guessedSong = this.songManager!.findSongByTitle(normalizedGuess);
 
         // If it exists but isn't the correct song
         if (guessedSong && guessedSong.id !== game.song.id) {
@@ -58,7 +67,7 @@ export class GameStateManager {
         }
 
         // If it's the correct song
-        if (normalizedGuess === this.songManager.normalizeTitle(game.song.title)) {
+        if (normalizedGuess === this.songManager!.normalizeTitle(game.song.title)) {
             return {
                 correct: true,
                 isValidSong: true,
@@ -76,6 +85,11 @@ export class GameStateManager {
     public getSong(channelId: string): Song | null {
         const game = this.activeGames.get(channelId);
         return game ? game.song : null;
+    }
+
+    public getDifficulty(channelId: string): string | null {
+        const game = this.activeGames.get(channelId);
+        return game ? game.difficulty : null;
     }
 
     public endGame(channelId: string): void {

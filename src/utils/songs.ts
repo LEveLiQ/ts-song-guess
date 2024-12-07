@@ -17,18 +17,17 @@ export interface Song {
 
 export class SongManager {
   private songs: Song[];
-  private readonly songsPath: string;
   private readonly songsDir: string;
 
-  constructor() {
-    this.songsPath = path.join(__dirname, '../../data/songs.json');
+  constructor(difficulty: string) {
     this.songsDir = path.join(__dirname, '../../data/songs');
-    this.songs = this.loadSongs();
+    this.songs = this.loadSongs(difficulty);
   }
 
-  private loadSongs(): Song[] {
+  private loadSongs(difficulty: string): Song[] { // TODO: different json files for difficulties
+    const songsPath = path.join(__dirname, `../../data/songs.json`);
     try {
-      const data = readFileSync(this.songsPath, 'utf8');
+      const data = readFileSync(songsPath, 'utf8');
       const { songs } = JSON.parse(data);
       return songs;
     } catch (error) {
@@ -42,11 +41,24 @@ export class SongManager {
     return this.songs[randomIndex];
   }
 
-public async createSongSnippet(song: Song): Promise<string> {
+  public async createSongSnippet(song: Song, difficulty: string): Promise<string> {
     const inputPath = path.join(this.songsDir, song.filePath);
     const outputPath = path.join(this.songsDir, `guess.mp4`);
     
     const startTime = Math.floor(Math.random() * 80) + 20; // Random time between 20-100 seconds
+    let duration: number;
+
+    switch (difficulty) {
+      case 'Normal':
+        duration = 2;
+        break;
+      case 'Hard':
+        duration = 1.5;
+        break;
+      case 'Extreme':
+        duration = 1;
+        break;
+    }
 
     return new Promise((resolve, reject) => {
       ffmpeg()
@@ -67,7 +79,7 @@ public async createSongSnippet(song: Song): Promise<string> {
           '-b:a 128k',
           '-ar 44100', // Standard audio sample rate
           '-pix_fmt yuv420p',
-          '-t 2',
+          `-t ${duration}`,
           '-y' // Overwrite output files
         ])
         .output(outputPath)
