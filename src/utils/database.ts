@@ -36,7 +36,7 @@ const db_functions = {
     return db.prepare(`
       UPDATE player
       SET total_score = total_score + ?,
-          games_played = games_played + 1,
+          guesses_taken = guesses_taken + 1,
           correct_guesses = correct_guesses + ?,
           last_played_at = CURRENT_TIMESTAMP
       WHERE discord_id = ?
