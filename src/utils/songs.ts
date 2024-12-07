@@ -42,16 +42,34 @@ export class SongManager {
     return this.songs[randomIndex];
   }
 
-  public async createSongSnippet(song: Song): Promise<string> {
+public async createSongSnippet(song: Song): Promise<string> {
     const inputPath = path.join(this.songsDir, song.filePath);
-    const outputPath = path.join(this.songsDir, `guess.mp3`);
+    const outputPath = path.join(this.songsDir, `guess.mp4`);
     
     const startTime = Math.floor(Math.random() * 80) + 20; // Random time between 20-100 seconds
 
     return new Promise((resolve, reject) => {
-      ffmpeg(inputPath)
-        .setStartTime(startTime)
-        .setDuration(2) // 2 second snippet
+      ffmpeg()
+        // First input - black video
+        .input('color=c=black:s=256x256:d=2')
+        .inputFormat('lavfi')
+        // Second input - audio with specific timing
+        .input(inputPath)
+        .inputOptions([
+          `-ss ${startTime}`
+        ])
+        .outputOptions([
+          '-map 0:v',
+          '-map 1:a',
+          '-c:v libx264',
+          '-c:a aac',
+          '-strict experimental',
+          '-b:a 128k',
+          '-ar 44100', // Standard audio sample rate
+          '-pix_fmt yuv420p',
+          '-t 2',
+          '-y' // Overwrite output files
+        ])
         .output(outputPath)
         .on('start', (command) => console.log('FFmpeg command:', command))
         .on('end', () => resolve(outputPath))
@@ -68,9 +86,13 @@ export class SongManager {
   }
 
   public findSongByTitle(title: string): Song | undefined {
-    const normalizedTitle = title.toLowerCase().trim();
+    const normalizedTitle = this.normalizeTitle(title);
     return this.songs.find(song => 
-        song.title.toLowerCase().trim() === normalizedTitle
+        this.normalizeTitle(song.title) === normalizedTitle
     );
+  }
+
+  public normalizeTitle(title: string): string {
+    return title.toLowerCase().replace(/[^a-z0-9]/g, '').trim();
   }
 }
