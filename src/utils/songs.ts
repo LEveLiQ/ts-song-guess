@@ -23,12 +23,19 @@ export class SongManager {
     this.songsDir = path.join(__dirname, '../../data/songs');
     this.songs = this.loadSongs(difficulty);
   }
-
-  private loadSongs(difficulty: string): Song[] { // TODO: different json files for difficulties
+  private loadSongs(difficulty: string): Song[] {
     const songsPath = path.join(__dirname, `../../data/songs.json`);
+    const preSongsPath = path.join(__dirname, `../../data/songs_pre.json`);
     try {
       const data = readFileSync(songsPath, 'utf8');
       const { songs } = JSON.parse(data);
+
+      if (difficulty === 'Hard' || difficulty === 'Extreme') {
+        const preData = readFileSync(preSongsPath, 'utf8');
+        const { songs: preSongs } = JSON.parse(preData);
+        return songs.concat(preSongs);
+      }
+
       return songs;
     } catch (error) {
       console.error('Error loading songs:', error);
@@ -56,7 +63,7 @@ export class SongManager {
         duration = 1.5;
         break;
       case 'Extreme':
-        duration = 1;
+        duration = 0.5;
         break;
     }
 
