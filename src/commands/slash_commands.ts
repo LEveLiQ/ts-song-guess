@@ -72,6 +72,6 @@ export const handleInteraction = async (interaction: CommandInteraction) => {
         }
     } catch (error) {
         console.error('Error handling interaction:', error);
-        await interaction.reply('There was an error executing that command!');
+        // await interaction.reply('There was an error executing that command!');
     }
 };

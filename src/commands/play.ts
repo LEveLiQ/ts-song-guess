@@ -5,9 +5,13 @@ import { unlink } from 'fs/promises';
 
 export const play = async (interaction: CommandInteraction, difficulty: string) => {
     const gameState = GameStateManager.getInstance();
-
+    const cooldown = gameState.isCooldownActive(interaction.user.id);
+    if (cooldown) {
+        await interaction.reply({ content: `You are on a cooldown! Please wait **${cooldown}** seconds before guessing again.`, ephemeral: true });
+        return;
+    }
     if (gameState.isGameActive(interaction.channelId!)) {
-        await interaction.reply('A game is already in progress in this channel! Wait for it to finish.');
+        await interaction.reply({ content: 'A game is already in progress in this channel! Wait for it to finish.', ephemeral: true });
         return;
     }
 

@@ -1,4 +1,5 @@
 import { Song, SongManager } from './songs';  // Import the Song type/interface
+import { db_functions } from './database'; // Import database functions
 
 export class GameStateManager {
     private static instance: GameStateManager;
@@ -35,6 +36,7 @@ export class GameStateManager {
     public startGame(channelId: string, song: Song, timeoutId: NodeJS.Timeout, difficulty: string): void {
         this.currentDifficulty = difficulty;
         this.initializeSongManager();
+
         this.activeGames.set(channelId, {
             channelId,
             startedAt: new Date(),
@@ -107,6 +109,31 @@ export class GameStateManager {
             if (gameAge > 60000) {
                 this.activeGames.delete(channelId);
             }
+        }
+    }
+
+    public isCooldownActive(userId: string): number | null {
+        const player = db_functions.ensurePlayer(userId, '');
+        if (!player.last_successful_guess) return null;
+
+        const lastGuessTime = new Date(player.last_successful_guess).getTime();
+        const now = Date.now();
+        const cooldownPeriod = this.getCooldownPeriod(player.last_guessed_difficulty);
+        const timeRemaining = cooldownPeriod - (now - lastGuessTime);
+
+        return timeRemaining > 0 ? Math.ceil(timeRemaining / 1000) : null;
+    }
+
+    private getCooldownPeriod(difficulty: string): number {
+        switch (difficulty) {
+            case 'Normal':
+                return 30000;
+            case 'Hard':
+                return 20000;
+            case 'Extreme':
+                return 10000;
+            default:
+                return 30000;
         }
     }
 }

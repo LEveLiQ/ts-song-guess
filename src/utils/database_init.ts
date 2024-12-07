@@ -18,8 +18,8 @@ db.exec(`
     total_score INTEGER DEFAULT 0,
     total_guesses INTEGER DEFAULT 0,
     correct_guesses INTEGER DEFAULT 0,
-    last_played_at DATETIME,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    last_successful_guess STRING,
+    last_guessed_difficulty TEXT
   );
 `);
 

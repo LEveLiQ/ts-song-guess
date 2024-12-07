@@ -9,8 +9,8 @@ interface Player {
   total_score: number;
   total_guesses: number;
   correct_guesses: number;
-  last_played_at: string;
-  created_at: string;
+  last_successful_guess: string;
+  last_guessed_difficulty: string;
 }
 
 interface LeaderboardEntry {
@@ -24,23 +24,24 @@ interface LeaderboardEntry {
 const db_functions = {
   ensurePlayer(discord_id: string, username: string): Player {
     return db.prepare(`
-      INSERT INTO player (discord_id, username)
-      VALUES (?, ?)
+      INSERT INTO player (discord_id, username, last_successful_guess, last_guessed_difficulty)
+      VALUES (?, ?, ?, ?)
       ON CONFLICT(discord_id) DO UPDATE SET
       username = excluded.username
       RETURNING *
-    `).get(discord_id, username) as Player; 
+    `).get(discord_id, username, '', '') as Player;
   },
 
-  updateScore(discord_id: string, points: number, guessed_correctly: boolean) {
+  updateScore(discord_id: string, points: number, guessed_correctly: boolean, difficulty: string) {
     return db.prepare(`
       UPDATE player
       SET total_score = total_score + ?,
           total_guesses = total_guesses + 1,
           correct_guesses = correct_guesses + ?,
-          last_played_at = CURRENT_TIMESTAMP
+          last_successful_guess = CASE WHEN ? = 1 THEN ? ELSE last_successful_guess END,
+          last_guessed_difficulty = CASE WHEN ? = 1 THEN ? ELSE last_guessed_difficulty END
       WHERE discord_id = ?
-    `).run(points, guessed_correctly ? 1 : 0, discord_id);
+    `).run(points, guessed_correctly ? 1 : 0, guessed_correctly ? 1 : 0, guessed_correctly ? new Date().toString() : null, guessed_correctly ? 1 : 0, guessed_correctly ? difficulty : null, discord_id);
   },
 
   getLeaderboard(limit = 10): LeaderboardEntry[] {
