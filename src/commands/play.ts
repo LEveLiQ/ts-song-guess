@@ -1,13 +1,13 @@
-import { Message, AttachmentBuilder } from 'discord.js';
+import { CommandInteraction, AttachmentBuilder } from 'discord.js';
 import { SongManager } from '../utils/songs';
 import { GameStateManager } from '../utils/game_state_manager';
 import { unlink } from 'fs/promises';
 
-export const play = async (message: Message) => {
+export const play = async (interaction: CommandInteraction) => {
     const gameState = GameStateManager.getInstance();
 
-    if (gameState.isGameActive(message.channelId)) {
-        await message.reply('A game is already in progress in this channel! Wait for it to finish.');
+    if (gameState.isGameActive(interaction.channelId!)) {
+        await interaction.reply('A game is already in progress in this channel! Wait for it to finish.');
         return;
     }
 
@@ -19,13 +19,15 @@ export const play = async (message: Message) => {
         const attachment = new AttachmentBuilder(snippetPath);
         
         const timeoutId = setTimeout(async () => {
-            gameState.endGame(message.channelId);
-            await message.channel.send(`⏰ Time's up! The song was **"${song.title}"**! 🎵`);
+            gameState.endGame(interaction.channelId!);
+                if (interaction.channel?.isTextBased() && 'send' in interaction.channel) {
+                    await interaction.channel.send(`⏰ Time's up! The song was **"${song.title}"**! 🎵`);
+                }
         }, 60000);
 
-        gameState.startGame(message.channelId, song, timeoutId);
+        gameState.startGame(interaction.channelId!, song, timeoutId);
         
-        await message.reply({
+        await interaction.reply({
             content: '🎵 Guess the song! You have 60 seconds.',
             files: [attachment]
         });
@@ -33,8 +35,8 @@ export const play = async (message: Message) => {
         await unlink(snippetPath);
         
     } catch (error) {
-        gameState.endGame(message.channelId);
+        gameState.endGame(interaction.channelId!);
         console.error('Error in play command:', error);
-        await message.reply('Sorry, there was an error starting the game!');
+        await interaction.reply('Sorry, there was an error starting the game!');
     }
 };
