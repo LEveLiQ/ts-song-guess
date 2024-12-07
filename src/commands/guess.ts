@@ -21,7 +21,7 @@ export const guess = async (interaction: CommandInteraction, args: string[]) => 
     if (result.correct) {
         const song = gameState.getSong(interaction.channelId);
         gameState.endGame(interaction.channelId);
-        await interaction.reply(`🎉 Correct! The song was **"${song!.title}"**! You win!`);
+        await interaction.reply(`🎉 Correct! The song was **"${song!.title}"**!`);
         db_functions.updateScore(interaction.user.id, 1, true);
     } else if (result.isValidSong) {
         await interaction.reply(`❌ **"${result.songTitle}"** is not the correct song! Try again!`);
