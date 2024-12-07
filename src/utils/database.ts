@@ -7,7 +7,7 @@ interface Player {
   discord_id: string;
   username: string;
   total_score: number;
-  games_played: number;
+  total_guesses: number;
   correct_guesses: number;
   last_played_at: string;
   created_at: string;
@@ -18,7 +18,7 @@ interface LeaderboardEntry {
     username: string;
     total_score: number;
     correct_guesses: number;
-    games_played: number;
+    total_guesses: number;
   }
 
 const db_functions = {
@@ -36,7 +36,7 @@ const db_functions = {
     return db.prepare(`
       UPDATE player
       SET total_score = total_score + ?,
-          guesses_taken = guesses_taken + 1,
+          total_guesses = total_guesses + 1,
           correct_guesses = correct_guesses + ?,
           last_played_at = CURRENT_TIMESTAMP
       WHERE discord_id = ?
@@ -45,7 +45,7 @@ const db_functions = {
 
   getLeaderboard(limit = 10): LeaderboardEntry[] {
     return db.prepare(`
-      SELECT discord_id, username, total_score, correct_guesses, games_played
+      SELECT discord_id, username, total_score, correct_guesses, total_guesses
       FROM player
       ORDER BY total_score DESC
       LIMIT ?

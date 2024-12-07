@@ -16,7 +16,7 @@ db.exec(`
     discord_id TEXT PRIMARY KEY,
     username TEXT NOT NULL,
     total_score INTEGER DEFAULT 0,
-    guesses_taken INTEGER DEFAULT 0,
+    total_guesses INTEGER DEFAULT 0,
     correct_guesses INTEGER DEFAULT 0,
     last_played_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
