@@ -10,27 +10,16 @@ if (!fs.existsSync(dbDir)) {
 
 const db = new Database(path.join(dbDir, 'scores.db'));
 
-// Initialize database tables with singular names
+// Initialize database
 db.exec(`
   CREATE TABLE IF NOT EXISTS player (
     discord_id TEXT PRIMARY KEY,
     username TEXT NOT NULL,
     total_score INTEGER DEFAULT 0,
-    games_played INTEGER DEFAULT 0,
+    guesses_taken INTEGER DEFAULT 0,
     correct_guesses INTEGER DEFAULT 0,
     last_played_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-
-  CREATE TABLE IF NOT EXISTS game (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    player_id TEXT,
-    song_id TEXT,
-    guessed_correctly BOOLEAN,
-    attempts_taken INTEGER,
-    time_taken INTEGER,
-    played_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(player_id) REFERENCES player(discord_id)
   );
 `);
 
