@@ -22,17 +22,30 @@ export const play = async (interaction: CommandInteraction, difficulty: string) 
         const snippetPath = await songManager.createSongSnippet(song, difficulty);
         const attachment = new AttachmentBuilder(snippetPath);
         
+        const getTimeLimit = (difficulty: string) => {
+            switch (difficulty) {
+                case 'Normal':
+                    return 60;
+                case 'Hard':
+                    return 45;
+                case 'Extreme':
+                    return 30;
+                default:
+                    return 60;
+            }
+        }
+
         const timeoutId = setTimeout(async () => {
             gameState.endGame(interaction.channelId!);
                 if (interaction.channel?.isTextBased() && 'send' in interaction.channel) {
                     await interaction.channel.send(`⏰ Time's up! The song was **"${song.title}"**! 🎵`);
                 }
-        }, 60000);
+        }, getTimeLimit(difficulty) * 1000);
 
         gameState.startGame(interaction.channelId!, song, timeoutId, difficulty);
         
         await interaction.reply({
-            content: `🎵 Guess the song! You have 60 seconds. Difficulty: **${difficulty}**`,
+            content: `🎵 Guess the song! You have **${getTimeLimit(difficulty)}** seconds. Difficulty: **${difficulty}**`,
             files: [attachment]
         });
 
