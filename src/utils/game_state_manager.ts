@@ -1,5 +1,6 @@
 import { Song, SongManager } from './songs';  // Import the Song type/interface
 import { db_functions } from './database'; // Import database functions
+import config from '../../config.json'; // Import config.json
 
 export class GameStateManager {
     private static instance: GameStateManager;
@@ -125,15 +126,6 @@ export class GameStateManager {
     }
 
     private getCooldownPeriod(difficulty: string): number {
-        switch (difficulty) {
-            case 'Normal':
-                return 30000;
-            case 'Hard':
-                return 20000;
-            case 'Extreme':
-                return 10000;
-            default:
-                return 30000;
-        }
+        return config.cooldownPeriods[difficulty as keyof typeof config.cooldownPeriods] * 1000 || 30000;
     }
 }

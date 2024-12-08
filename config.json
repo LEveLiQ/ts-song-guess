@@ -1,0 +1,17 @@
+{
+  "songSnippetDurations": {
+    "Normal": 2,
+    "Hard": 1.5,
+    "Extreme": 0.5
+  },
+  "timeLimits": {
+    "Normal": 60,
+    "Hard": 45,
+    "Extreme": 30
+  },
+  "cooldownPeriods": {
+    "Normal": 30,
+    "Hard": 20,
+    "Extreme": 10
+  }
+}

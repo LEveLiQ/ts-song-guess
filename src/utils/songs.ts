@@ -2,6 +2,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import ffmpegStatic from 'ffmpeg-static';
 import path from 'path';
 import { readFileSync } from 'fs';
+import config from '../../config.json';
 
 if (!ffmpegStatic) {
     throw new Error('ffmpeg-static path is null. Please ensure ffmpeg-static is properly installed.');
@@ -53,19 +54,7 @@ export class SongManager {
     const outputPath = path.join(this.songsDir, `guess.mp4`);
     
     const startTime = Math.floor(Math.random() * 80) + 20; // Random time between 20-100 seconds
-    let duration: number;
-
-    switch (difficulty) {
-      case 'Normal':
-        duration = 2;
-        break;
-      case 'Hard':
-        duration = 1.5;
-        break;
-      case 'Extreme':
-        duration = 0.5;
-        break;
-    }
+    const duration = config.songSnippetDurations[difficulty as keyof typeof config.songSnippetDurations] || 2;
 
     return new Promise((resolve, reject) => {
       ffmpeg()

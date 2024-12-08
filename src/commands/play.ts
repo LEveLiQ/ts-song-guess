@@ -2,6 +2,7 @@ import { CommandInteraction, AttachmentBuilder } from 'discord.js';
 import { SongManager } from '../utils/songs';
 import { GameStateManager } from '../utils/game_state_manager';
 import { unlink } from 'fs/promises';
+import config from '../../config.json';
 
 export const play = async (interaction: CommandInteraction, difficulty: string) => {
     const gameState = GameStateManager.getInstance();
@@ -23,16 +24,7 @@ export const play = async (interaction: CommandInteraction, difficulty: string) 
         const attachment = new AttachmentBuilder(snippetPath);
         
         const getTimeLimit = (difficulty: string) => {
-            switch (difficulty) {
-                case 'Normal':
-                    return 60;
-                case 'Hard':
-                    return 45;
-                case 'Extreme':
-                    return 30;
-                default:
-                    return 60;
-            }
+            return config.timeLimits[difficulty as keyof typeof config.timeLimits] || 60;
         }
 
         const timeoutId = setTimeout(async () => {
