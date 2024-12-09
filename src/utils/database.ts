@@ -22,7 +22,7 @@ interface LeaderboardEntry {
   }
 
 const db_functions = {
-  ensurePlayer(discord_id: string, username: string): Player {
+  ensurePlayer(discord_id: string, username: string = ''): Player {
     return db.prepare(`
       INSERT INTO player (discord_id, username, last_successful_guess, last_guessed_difficulty)
       VALUES (?, ?, ?, ?)

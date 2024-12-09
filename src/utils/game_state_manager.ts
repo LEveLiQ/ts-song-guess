@@ -114,7 +114,7 @@ export class GameStateManager {
     }
 
     public isCooldownActive(userId: string): number | null {
-        const player = db_functions.ensurePlayer(userId, '');
+        const player = db_functions.ensurePlayer(userId);
         if (!player.last_successful_guess) return null;
 
         const lastGuessTime = new Date(player.last_successful_guess).getTime();

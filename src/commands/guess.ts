@@ -14,7 +14,7 @@ export const guess = async (interaction: CommandInteraction, args: string[]) => 
         return;
     }
 
-    await db_functions.ensurePlayer(interaction.user.id, interaction.user.username);
+    await db_functions.ensurePlayer(String(interaction.user.id), String(interaction.user.username));
     const guess = args.join(' ');
     const result = gameState.validateGuess(interaction.channelId, guess);
 
