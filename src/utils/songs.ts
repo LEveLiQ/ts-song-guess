@@ -53,7 +53,7 @@ export class SongManager {
     const inputPath = path.join(this.songsDir, song.filePath);
     const outputPath = path.join(this.songsDir, `guess.mp4`);
     
-    const startTime = Math.floor(Math.random() * 80) + 20; // Random time between 20-100 seconds
+    const startTime = Math.floor(Math.random() * (config.randomSnippetGeneration.end - config.randomSnippetGeneration.start)) + config.randomSnippetGeneration.start;
     const duration = config.songSnippetDurations[difficulty as keyof typeof config.songSnippetDurations] || 2;
 
     return new Promise((resolve, reject) => {

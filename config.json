@@ -13,5 +13,9 @@
     "Normal": 30,
     "Hard": 20,
     "Extreme": 10
+  },
+  "randomSnippetGeneration": {
+    "start": 10,
+    "end": 120
   }
 }
