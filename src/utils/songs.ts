@@ -44,6 +44,10 @@ export class SongManager {
     }
   }
 
+  public getAllSongTitles(): string[] {
+    return this.songs.map(song => song.title);
+  }
+
   public getRandomSong(): Song {
     const randomIndex = Math.floor(Math.random() * this.songs.length);
     return this.songs[randomIndex];

@@ -18,7 +18,7 @@ client.once('ready', async () => {
 });
 
 client.on('interactionCreate', async (interaction: Interaction) => {
-    if (!interaction.isCommand()) return;
+    if (!interaction.isCommand() && !interaction.isAutocomplete()) return;
     await handleInteraction(interaction);
 });
 
