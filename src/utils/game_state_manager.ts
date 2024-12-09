@@ -60,6 +60,16 @@ export class GameStateManager {
         // Use SongManager to find the song
         const guessedSong = this.songManager!.findSongByTitle(normalizedGuess);
 
+        // If it's the correct song
+        if (normalizedGuess === this.songManager!.normalizeTitle(game.song.title) ||
+        (game.difficulty !== 'Extreme' && game.song.aliases && game.song.aliases.some(alias => normalizedGuess === this.songManager!.normalizeTitle(alias)))) {
+            return {
+                correct: true,
+                isValidSong: true,
+                songTitle: game.song.title
+            };
+        }
+
         // If it exists but isn't the correct song
         if (guessedSong && guessedSong.id !== game.song.id) {
             return {
@@ -69,14 +79,6 @@ export class GameStateManager {
             };
         }
 
-        // If it's the correct song
-        if (normalizedGuess === this.songManager!.normalizeTitle(game.song.title)) {
-            return {
-                correct: true,
-                isValidSong: true,
-                songTitle: game.song.title
-            };
-        }
 
         // If the song doesn't exist in our database
         return {
@@ -126,6 +128,6 @@ export class GameStateManager {
     }
 
     private getCooldownPeriod(difficulty: string): number {
-        return config.cooldownPeriods[difficulty as keyof typeof config.cooldownPeriods] * 1000 || 30000;
+        return config.cooldownPeriods[difficulty as keyof typeof config.cooldownPeriods] * 1000 || 0;
     }
 }

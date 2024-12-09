@@ -11,9 +11,10 @@ if (!ffmpegStatic) {
 ffmpeg.setFfmpegPath(ffmpegStatic);
 
 export interface Song {
-  id: string;      // filename without extension (e.g., "stronger")
-  title: string;   // actual song title (e.g., "Stronger")
-  filePath: string;// path to MP3 file relative to data/songs
+  id: string;            // filename without extension (e.g., "stronger")
+  title: string;        // actual song title (e.g., "Stronger")
+  filePath: string;    // path to MP3 file relative to data/songs
+  aliases?: string[]; // optional array of aliases for the song
 }
 
 export class SongManager {
@@ -101,6 +102,15 @@ export class SongManager {
     const normalizedTitle = this.normalizeTitle(title);
     return this.songs.find(song => 
         this.normalizeTitle(song.title) === normalizedTitle
+    );
+  }
+
+  public findSongAlias(title: string): Song | undefined {
+    const normalizedTitle = this.normalizeTitle(title);
+    return this.songs.find(song => 
+        song.aliases && song.aliases.some(alias => 
+            this.normalizeTitle(alias) === normalizedTitle
+        )
     );
   }
 
