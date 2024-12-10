@@ -5,7 +5,6 @@ const db = new Database(path.join(__dirname, '../../data/db/scores.db'));
 
 interface Player {
   discord_id: string;
-  username: string;
   total_score: number;
   total_guesses: number;
   correct_guesses: number;
@@ -15,7 +14,6 @@ interface Player {
 
 interface LeaderboardEntry {
     discord_id: string;
-    username: string;
     total_score: number;
     correct_guesses: number;
     total_guesses: number;
@@ -23,13 +21,22 @@ interface LeaderboardEntry {
 
 const db_functions = {
   ensurePlayer(discord_id: string, username: string = ''): Player {
-    return db.prepare(`
+    const insertStmt = db.prepare(`
       INSERT INTO player (discord_id, username, last_successful_guess, last_guessed_difficulty)
       VALUES (?, ?, ?, ?)
-      ON CONFLICT(discord_id) DO UPDATE SET
-      username = excluded.username
-      RETURNING *
-    `).get(discord_id, username, '', '') as Player;
+      ON CONFLICT(discord_id) DO NOTHING
+    `);
+  
+    const selectStmt = db.prepare(`
+      SELECT * FROM player WHERE discord_id = ?
+    `);
+  
+    const transaction = db.transaction((discordId) => {
+      insertStmt.run(discordId, username, '', '');
+      return selectStmt.get(discordId);
+    });
+  
+    return transaction(discord_id) as Player;
   },
 
   updateScore(discord_id: string, points: number, guessed_correctly: boolean, difficulty: string) {
@@ -41,12 +48,12 @@ const db_functions = {
           last_successful_guess = CASE WHEN ? = 1 THEN ? ELSE last_successful_guess END,
           last_guessed_difficulty = CASE WHEN ? = 1 THEN ? ELSE last_guessed_difficulty END
       WHERE discord_id = ?
-    `).run(points, guessed_correctly ? 1 : 0, guessed_correctly ? 1 : 0, guessed_correctly ? new Date().toString() : null, guessed_correctly ? 1 : 0, guessed_correctly ? difficulty : null, discord_id);
+    `).run(points, guessed_correctly ? 1 : 0, guessed_correctly ? 1 : 0, new Date().toString(), guessed_correctly ? 1 : 0, difficulty, discord_id);
   },
 
   getLeaderboard(limit = 10): LeaderboardEntry[] {
     return db.prepare(`
-      SELECT discord_id, username, total_score, correct_guesses, total_guesses
+      SELECT discord_id, total_score, correct_guesses, total_guesses
       FROM player
       ORDER BY total_score DESC
       LIMIT ?
