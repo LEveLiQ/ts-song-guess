@@ -11,6 +11,7 @@ build/
 .env.local
 .env.*
 ssh.key
+ssh.ppk
 
 # IDE and editor files
 .vscode/*
