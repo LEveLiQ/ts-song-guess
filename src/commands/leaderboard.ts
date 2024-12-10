@@ -9,9 +9,8 @@ export const leaderboard = async (interaction: CommandInteraction) => {
             : 0;
         
         const member = await interaction.guild?.members.fetch(p.discord_id).catch(() => null);
-        const displayName = member?.nickname || member?.user.globalName || p.username;
         
-        return `${i + 1}. ${displayName} (\`${p.username}\`) - ${p.total_score} points (${accuracy}% accuracy, ${p.correct_guesses}/${p.total_guesses} correct)`;
+        return `${i + 1}. ${member?.nickname || member?.user.globalName || member?.user.username} (\`${member?.user.username}\`) - ${p.total_score} points (${accuracy}% accuracy, ${p.correct_guesses}/${p.total_guesses} correct)`;
     }));
 
     interaction.reply(`🏆 **Leaderboard:**\n${leaderText.join('\n') || 'No players yet!'}`);
