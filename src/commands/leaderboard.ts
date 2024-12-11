@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction, EmbedBuilder } from 'discord.js';
 import { db_functions, LeaderboardEntry } from '../utils/database';
 
 export const leaderboard = async (interaction: CommandInteraction) => {
@@ -10,8 +10,15 @@ export const leaderboard = async (interaction: CommandInteraction) => {
         
         const member = await interaction.guild?.members.fetch(p.discord_id).catch(() => null);
         
-        return `${i + 1}. ${member?.nickname || member?.user.globalName || member?.user.username} (\`${member?.user.username}\`) - ${p.total_score} points (${accuracy}% accuracy, ${p.correct_guesses}/${p.total_guesses} correct)`;
+        return `${i + 1}. <@${member?.id}> :󠇰 **${p.total_score}** points | ${accuracy}% accuracy (${p.correct_guesses}/${p.total_guesses})`;
     }));
 
-    interaction.reply(`🏆 **Leaderboard:**\n${leaderText.join('\n') || 'No players yet!'}`);
+    const embed = new EmbedBuilder()
+        .setColor(0xFFD700)
+        .setTitle('🏆  Song Guess Leaderboard')
+        .setDescription(leaderText.join('\n') || 'No players yet!')
+        .setTimestamp()
+        .setFooter({ text: 'Updated' });
+
+    await interaction.reply({ embeds: [embed] });
 };
