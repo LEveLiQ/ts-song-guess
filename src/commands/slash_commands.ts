@@ -3,6 +3,7 @@ import { Routes } from 'discord-api-types/v9';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Client, CommandInteraction, CommandInteractionOptionResolver, AutocompleteInteraction } from 'discord.js';
 import { SongManager } from '../utils/songs';
+import { GameStateManager } from '../utils/game_state_manager';
 import { play } from './play';
 import { leaderboard } from './leaderboard';
 import { guess } from './guess';
@@ -73,25 +74,27 @@ export const handleInteraction = async (interaction: CommandInteraction | Autoco
 
     const { commandName, options } = interaction as CommandInteraction & { options: CommandInteractionOptionResolver };
 
-    try {
-        switch (commandName) {
-            case 'play': {
-                const difficulty = options.getString('difficulty', false) ?? 'Normal';
-                await play(interaction, difficulty);
-                break;
+    await GameStateManager.getInstance().executeCommand(interaction.channelId!, async () => {
+        try {
+            switch (commandName) {
+                case 'play': {
+                    const difficulty = options.getString('difficulty', false) ?? 'Normal';
+                    await play(interaction, difficulty);
+                    break;
+                }
+                case 'leaderboard': {
+                    await leaderboard(interaction);
+                    break;
+                }
+                case 'guess': {
+                    const song = options.getString('song', true);
+                    await guess(interaction, [song]);
+                    break;
+                }
             }
-            case 'leaderboard': {
-                await leaderboard(interaction);
-                break;
-            }
-            case 'guess': {
-                const song = options.getString('song', true);
-                await guess(interaction, [song]);
-                break; 
-            }
+        } catch (error) {
+            console.error('Error handling interaction:', error);
+            // await interaction.reply('There was an error executing that command!');
         }
-    } catch (error) {
-        console.error('Error handling interaction:', error);
-        // await interaction.reply('There was an error executing that command!');
-    }
+    });
 };

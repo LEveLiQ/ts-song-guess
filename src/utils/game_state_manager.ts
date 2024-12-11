@@ -1,6 +1,6 @@
-import { Song, SongManager } from './songs';  // Import the Song type/interface
-import { db_functions } from './database'; // Import database functions
-import config from '../../config.json'; // Import config.json
+import { Song, SongManager } from './songs';
+import { db_functions } from './database';
+import config from '../../config.json';
 
 export class GameStateManager {
     private static instance: GameStateManager;
@@ -13,6 +13,7 @@ export class GameStateManager {
     }> = new Map();
     private songManager: SongManager | null = null;
     private currentDifficulty: string | null = null;
+    private commandQueue: Map<string, boolean> = new Map();
 
     private constructor() {}
 
@@ -21,6 +22,19 @@ export class GameStateManager {
             GameStateManager.instance = new GameStateManager();
         }
         return GameStateManager.instance;
+    }
+
+    public async executeCommand(channelId: string, command: () => Promise<void>): Promise<void> {
+        if (this.commandQueue.get(channelId)) {
+            return;
+        }
+        
+        try {
+            this.commandQueue.set(channelId, true);
+            await command();
+        } finally {
+            this.commandQueue.delete(channelId);
+        }
     }
 
     private initializeSongManager(): void {
@@ -57,10 +71,8 @@ export class GameStateManager {
 
         const normalizedGuess = this.songManager!.normalizeTitle(guess);
         
-        // Use SongManager to find the song
         const guessedSong = this.songManager!.findSongByTitle(normalizedGuess);
 
-        // If it's the correct song
         if (normalizedGuess === this.songManager!.normalizeTitle(game.song.title) ||
         (game.difficulty !== 'Extreme' && game.song.aliases && game.song.aliases.some(alias => normalizedGuess === this.songManager!.normalizeTitle(alias)))) {
             return {
@@ -70,7 +82,6 @@ export class GameStateManager {
             };
         }
 
-        // If it exists but isn't the correct song
         if (guessedSong && guessedSong.id !== game.song.id) {
             return {
                 correct: false,
@@ -79,8 +90,6 @@ export class GameStateManager {
             };
         }
 
-
-        // If the song doesn't exist in our database
         return {
             correct: false,
             isValidSong: false
