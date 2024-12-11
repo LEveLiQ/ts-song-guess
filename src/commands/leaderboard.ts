@@ -17,8 +17,7 @@ export const leaderboard = async (interaction: CommandInteraction) => {
         .setColor(0xFFD700)
         .setTitle('🏆  Song Guess Leaderboard')
         .setDescription(leaderText.join('\n') || 'No players yet!')
-        .setTimestamp()
-        .setFooter({ text: 'Updated' });
+        .setFooter({ text: 'Made with ❤️ by LEveLiQ' });
 
     await interaction.reply({ embeds: [embed] });
 };
