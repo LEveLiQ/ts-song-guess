@@ -11,10 +11,10 @@ if (!ffmpegStatic) {
 ffmpeg.setFfmpegPath(ffmpegStatic);
 
 export interface Song {
-  id: string;            // filename without extension (e.g., "stronger")
-  title: string;        // actual song title (e.g., "Stronger")
-  filePath: string;    // path to MP3 file relative to data/songs
-  aliases?: string[]; // optional array of aliases for the song
+  id: string;
+  title: string;
+  filePath: string;
+  aliases?: string[];
 }
 
 export class SongManager {
