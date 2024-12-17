@@ -26,13 +26,15 @@ This includes all 76 publicly known songs, starting from Oh My Love.
   - Cooldown: 30 minutes
   - Points per correct guess: 1
 - **Hard**:
-  - Snippet length: 1.5 seconds
-  - Time limit: 45 seconds
+  - Snippet length: 1.4 seconds
+  - Time limit: 50 seconds
   - Cooldown: 20 minutes
   - Points per correct guess: 2
 - **Extreme**:
-  - Snippet length: 1 second
-  - Time limit: 30 seconds
+  - Snippet length: 0.7 seconds
+  - Time limit: 50 seconds
   - Cooldown: 10 minutes
   - Points per correct guess: 3
-> \* Failing to guess before the end of the game will result in a 10 minute cooldown.
+  - **Stripped and remixes are considered separately**
+
+> \* Failing to guess before the game ends will result in 10 minute cooldown.

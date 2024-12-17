@@ -7,6 +7,8 @@ import { GameStateManager } from '../utils/game_state_manager';
 import { play } from './play';
 import { leaderboard } from './leaderboard';
 import { guess } from './guess';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 const commands = [
     new SlashCommandBuilder()
@@ -31,7 +33,10 @@ const commands = [
             option.setName('song')
                 .setDescription('The name of the song')
                 .setRequired(true)
-                .setAutocomplete(true))
+                .setAutocomplete(true)),
+    new SlashCommandBuilder()
+        .setName('help')
+        .setDescription('Show game information and how to play')
 ].map(command => command.toJSON());
 
 export const registerCommands = async (client: Client) => {
@@ -89,6 +94,11 @@ export const handleInteraction = async (interaction: CommandInteraction | Autoco
                 case 'guess': {
                     const song = options.getString('song', true);
                     await guess(interaction, [song]);
+                    break;
+                }
+                case 'help': {
+                    const content = await fs.readFile(path.join(__dirname, '../../help.md'), 'utf8');
+                    await interaction.reply({ content, ephemeral: true });
                     break;
                 }
             }
