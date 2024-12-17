@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3';
+import Database, { RunResult } from 'better-sqlite3';
 import path from 'path';
 
 const db = new Database(path.join(__dirname, '../../data/db/scores.db'));
@@ -39,7 +39,7 @@ const db_functions = {
     return transaction(discord_id) as Player;
   },
 
-  updateScore(discord_id: string, points: number, guessed_correctly: boolean, difficulty: string) {
+  updateScore(discord_id: string, points: number, guessed_correctly: boolean, difficulty: string): RunResult {
     return db.prepare(`
       UPDATE player
       SET total_score = total_score + ?,
@@ -51,7 +51,7 @@ const db_functions = {
     `).run(points, guessed_correctly ? 1 : 0, guessed_correctly ? 1 : 0, new Date().toString(), guessed_correctly ? 1 : 0, difficulty, discord_id);
   },
 
-  updateLastGuess(discord_id: string) {
+  updateLastGuess(discord_id: string): RunResult {
     return db.prepare(`
       UPDATE player
       SET last_successful_guess = ?,
@@ -67,6 +67,22 @@ const db_functions = {
       ORDER BY total_score DESC
       LIMIT ?
     `).all(limit) as LeaderboardEntry[];
+  },
+
+  removeCooldown(discord_id: string): RunResult {
+    return db.prepare(`
+      UPDATE player
+      SET last_successful_guess = '',
+          last_guessed_difficulty = ''
+      WHERE discord_id = ?
+    `).run(discord_id);
+  },
+
+  resetPlayer(discord_id: string): RunResult {
+    return db.prepare(`
+      DELETE FROM player
+      WHERE discord_id = ?
+    `).run(discord_id);
   }
 };
 

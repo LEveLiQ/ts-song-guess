@@ -7,6 +7,7 @@ import { GameStateManager } from '../utils/game_state_manager';
 import { play } from './play';
 import { leaderboard } from './leaderboard';
 import { guess } from './guess';
+import { removeCooldown, resetPlayer } from './moderation';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -36,7 +37,21 @@ const commands = [
                 .setAutocomplete(true)),
     new SlashCommandBuilder()
         .setName('help')
-        .setDescription('Show game information and how to play')
+        .setDescription('Show game information and how to play'),
+    new SlashCommandBuilder()
+        .setName('remove-cooldown')
+        .setDescription('Remove cooldown for a user')
+        .addUserOption(option => 
+            option.setName('user')
+                .setDescription('User to remove cooldown from')
+                .setRequired(true)),
+    new SlashCommandBuilder()
+        .setName('reset-player')
+        .setDescription('Reset a player\'s data')
+        .addUserOption(option => 
+            option.setName('user')
+                .setDescription('Player to reset')
+                .setRequired(true)),
 ].map(command => command.toJSON());
 
 export const registerCommands = async (client: Client) => {
@@ -99,6 +114,16 @@ export const handleInteraction = async (interaction: CommandInteraction | Autoco
                 case 'help': {
                     const content = await fs.readFile(path.join(__dirname, '../../help.md'), 'utf8');
                     await interaction.reply({ content, ephemeral: true });
+                    break;
+                }
+                case 'remove-cooldown': {
+                    const user = options.getUser('user', true);
+                    await removeCooldown(interaction, [user.id]);
+                    break;
+                }
+                case 'reset-player': {
+                    const user = options.getUser('user', true);
+                    await resetPlayer(interaction, [user.id]);
                     break;
                 }
             }

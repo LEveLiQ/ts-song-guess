@@ -18,5 +18,6 @@
   "randomSnippetGeneration": {
     "start": 10,
     "end": 120
-  }
+  },
+  "moderatorRoleId": ["928000205893275678"]
 }
