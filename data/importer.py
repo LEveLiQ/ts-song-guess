@@ -13,7 +13,7 @@ def generate_songs_json(songs_dir, output_filename):
 
     # Use case-insensitive matching for .mp3 files
     for song_file in songs_dir.glob("**/*.mp3"):
-        file_path = str(song_file.relative_to(songs_dir))
+        file_path = str(song_file.relative_to(songs_dir)).replace('\\', '/')
 
         try:
             tag = TinyTag.get(song_file)
