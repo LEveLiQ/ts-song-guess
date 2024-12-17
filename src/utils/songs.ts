@@ -28,14 +28,21 @@ export class SongManager {
   private loadSongs(difficulty: string): Song[] {
     const songsPath = path.join(__dirname, `../../data/songs.json`);
     const preSongsPath = path.join(__dirname, `../../data/songs_pre.json`);
+    const oldSongsPath = path.join(__dirname, `../../data/songs_old.json`);
     try {
       const data = readFileSync(songsPath, 'utf8');
-      const { songs } = JSON.parse(data);
+      let { songs } = JSON.parse(data);
 
       if (difficulty === 'Hard' || difficulty === 'Extreme') {
         const preData = readFileSync(preSongsPath, 'utf8');
         const { songs: preSongs } = JSON.parse(preData);
-        return songs.concat(preSongs);
+        songs = songs.concat(preSongs);
+      }
+
+      if (difficulty === 'Extreme') {
+        const oldData = readFileSync(oldSongsPath, 'utf8');
+        const { songs: oldSongs } = JSON.parse(oldData);
+        songs = songs.concat(oldSongs);
       }
 
       return songs;
