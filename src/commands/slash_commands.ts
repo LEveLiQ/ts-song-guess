@@ -61,7 +61,7 @@ export const registerCommands = async (client: Client) => {
         console.log('Started refreshing application (/) commands.');
 
         await rest.put(
-            Routes.applicationCommands(client.user!.id),
+            Routes.applicationGuildCommands(client.user!.id, process.env.GUILD_ID!),
             { body: commands }
         );
 
