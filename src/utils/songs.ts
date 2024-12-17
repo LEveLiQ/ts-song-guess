@@ -63,34 +63,38 @@ export class SongManager {
 
     return new Promise((resolve, reject) => {
       ffmpeg()
-        // First input - black video
-        .input('color=c=black:s=256x256:d=2')
-        .inputFormat('lavfi')
-        // Second input - audio with specific timing
-        .input(inputPath)
-        .inputOptions([
-          `-ss ${startTime}`
-        ])
-        .outputOptions([
-          '-map 0:v',
-          '-map 1:a',
-          '-c:v libx264',
-          '-c:a aac',
-          '-strict experimental',
-          '-b:a 128k',
-          '-ar 44100', // Standard audio sample rate
-          '-pix_fmt yuv420p',
-          `-t ${duration}`,
-          '-y' // Overwrite output files
-        ])
-        .output(outputPath)
-        .on('start', (command) => console.log('FFmpeg command:', command))
-        .on('end', () => resolve(outputPath))
-        .on('error', (err) => {
-          console.error('FFmpeg error:', err);
-          reject(err);
-        })
-        .run();
+      // First input - the PNG image
+      .input(path.join(__dirname, '../../data/thumb.png'))
+      .inputFormat('image2')
+      // Second input - audio with specific timing
+      .input(inputPath)
+      .inputOptions([
+        `-ss ${startTime}`
+      ])
+      .outputOptions([
+        '-map 0:v',
+        '-map 1:a',
+        '-c:v libx264',
+        '-profile:v baseline',   // Use baseline profile
+        '-movflags +faststart',   // Move MOOV atom to the start for better streaming
+        '-r 30',                // Enforce constant frame rate of 30 fps
+        '-c:a aac',
+        '-b:a 128k', // Ensure consistent audio bitrate
+        '-ar 44100',
+        '-pix_fmt yuvj420p',
+        '-color_range 1',
+        '-colorspace bt709',
+        `-t ${duration}`,
+        '-y'
+      ])
+      .output(outputPath)
+      .on('start', (command) => console.log('FFmpeg command:', command))
+      .on('end', () => resolve(outputPath))
+      .on('error', (err) => {
+        console.error('FFmpeg error:', err);
+        reject(err);
+      })
+      .run();
     });
   }
 
