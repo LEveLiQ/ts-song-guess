@@ -1,19 +1,19 @@
 {
   "songSnippetDurations": {
     "Normal": 2,
-    "Hard": 1.5,
-    "Extreme": 0.5
+    "Hard": 1.4,
+    "Extreme": 0.7
   },
   "timeLimits": {
     "Normal": 60,
-    "Hard": 45,
-    "Extreme": 30
+    "Hard": 50,
+    "Extreme": 40
   },
   "cooldownPeriods": {
-    "Normal": 18,
-    "Hard": 12,
-    "Extreme": 6,
-    "Failed": 6
+    "Normal": 1800,
+    "Hard": 1200,
+    "Extreme": 600,
+    "Failed": 600
   },
   "randomSnippetGeneration": {
     "start": 10,
