@@ -51,6 +51,15 @@ const db_functions = {
     `).run(points, guessed_correctly ? 1 : 0, guessed_correctly ? 1 : 0, new Date().toString(), guessed_correctly ? 1 : 0, difficulty, discord_id);
   },
 
+  updateLastGuess(discord_id: string) {
+    return db.prepare(`
+      UPDATE player
+      SET last_successful_guess = ?,
+          last_guessed_difficulty = 'Failed'
+      WHERE discord_id = ?
+    `).run(new Date().toString(), discord_id);
+  },
+
   getLeaderboard(limit = 10): LeaderboardEntry[] {
     return db.prepare(`
       SELECT discord_id, total_score, correct_guesses, total_guesses

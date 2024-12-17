@@ -10,9 +10,10 @@
     "Extreme": 30
   },
   "cooldownPeriods": {
-    "Normal": 30,
-    "Hard": 20,
-    "Extreme": 10
+    "Normal": 18,
+    "Hard": 12,
+    "Extreme": 6,
+    "Failed": 6
   },
   "randomSnippetGeneration": {
     "start": 10,

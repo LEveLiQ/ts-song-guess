@@ -9,7 +9,8 @@ export class GameStateManager {
         startedAt: Date,
         timeoutId?: NodeJS.Timeout
         song: Song,
-        difficulty: string
+        difficulty: string,
+        guessedUsers?: string[]
     }> = new Map();
     private songManager: SongManager | null = null;
     private currentDifficulty: string | null = null;
@@ -61,6 +62,19 @@ export class GameStateManager {
         });
     }
 
+    public addGuessedUser(channelId: string, userId: string): void {
+        const game = this.activeGames.get(channelId);
+        if (!game) return;
+
+        if (!game.guessedUsers) {
+            game.guessedUsers = [];
+        }
+
+        if (!game.guessedUsers.includes(userId)) {
+            game.guessedUsers.push(userId);
+        }
+    }
+
     public validateGuess(channelId: string, guess: string): {
         correct: boolean;
         isValidSong: boolean;
@@ -106,10 +120,17 @@ export class GameStateManager {
         return game ? game.difficulty : null;
     }
 
-    public endGame(channelId: string): void {
+    public endGame(channelId: string, gameEndedByTimeout: boolean): void {
         const game = this.activeGames.get(channelId);
-        if (game?.timeoutId) {
-            clearTimeout(game.timeoutId);
+        if (!game) return;
+
+        clearTimeout(game.timeoutId);
+        if (gameEndedByTimeout) {
+            if (game.guessedUsers) {
+                game.guessedUsers.forEach(userId => {
+                    db_functions.updateLastGuess(userId);
+                });
+            }
         }
         this.activeGames.delete(channelId);
     }

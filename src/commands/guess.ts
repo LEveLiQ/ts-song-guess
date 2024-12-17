@@ -17,6 +17,7 @@ export const guess = async (interaction: CommandInteraction, args: string[]) => 
     await db_functions.ensurePlayer(interaction.user.id, interaction.user.username);
     const guess = args.join(' ');
     const result = gameState.validateGuess(interaction.channelId, guess);
+    gameState.addGuessedUser(interaction.channelId, interaction.user.id);
 
     if (result.correct) {
         const song = gameState.getSong(interaction.channelId);
@@ -33,7 +34,7 @@ export const guess = async (interaction: CommandInteraction, args: string[]) => 
                 db_functions.updateScore(interaction.user.id, 3, true, difficulty);
                 break;
         }
-        gameState.endGame(interaction.channelId);
+        gameState.endGame(interaction.channelId, false);
     } else if (result.isValidSong) {
         await interaction.reply(`❌ **"${result.songTitle}"** is not the correct song! Try again!`);
         db_functions.updateScore(interaction.user.id, 0, false, '');

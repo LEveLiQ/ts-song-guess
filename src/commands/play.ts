@@ -28,14 +28,15 @@ export const play = async (interaction: CommandInteraction, difficulty: string) 
         }
 
         const timeoutId = setTimeout(async () => {
-            gameState.endGame(interaction.channelId!);
-                if (interaction.channel?.isTextBased() && 'send' in interaction.channel) {
-                    await interaction.channel.send(`⏰ Time's up! The song was **"${song.title}"**! 🎵`);
-                }
+            gameState.endGame(interaction.channelId!, true);
+            if (interaction.channel?.isTextBased() && 'send' in interaction.channel) {
+                await interaction.channel.send(`⏰ Time's up! The song was **"${song.title}"**! 🎵`);
+            }
         }, getTimeLimit(difficulty) * 1000);
 
         gameState.startGame(interaction.channelId!, song, timeoutId, difficulty);
-        
+        gameState.addGuessedUser(interaction.channelId!, interaction.user.id);
+
         await interaction.reply({
             content: `🎵 Guess the song! You have **${getTimeLimit(difficulty)}** seconds. Difficulty: **${difficulty}**`,
             files: [attachment]
@@ -44,7 +45,7 @@ export const play = async (interaction: CommandInteraction, difficulty: string) 
         await unlink(snippetPath);
         
     } catch (error) {
-        gameState.endGame(interaction.channelId!);
+        gameState.endGame(interaction.channelId!, false);
         console.error('Error in play command:', error);
         await interaction.reply('Sorry, there was an error starting the game!');
     }
